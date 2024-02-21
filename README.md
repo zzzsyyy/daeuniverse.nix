@@ -5,21 +5,25 @@
 ## build with nix
 
 ```nix
-$ nix build github:daeuniverse/flake.nix#packages.x86_64-linux.dae
+nix build .#dae
 ```
 
-## Use with flake
+## Experimental build
 
-1. Import nixosModule.
+If you would like to get a taste of new features and do not want to wait for new releases, you may use the `experimental` (exp branch) flake. The `experimental` flake is always _**ahead**_ with the upstream `dae` and `daed` (sync with upstream `prs` to test new features or fix bugs) projects. Most of the time, newly proposed changes will be included in PRs, will be fully tested, and will be exported as cross-platform executable binaries in builds (GitHub Action Workflow Build).
+
+> [!WARNING]
+> Noted that newly introduced features are sometimes buggy, do it at your own risk. However, we still highly encourage you to check out our latest builds as it may help us further analyze features stability and resolve potential bugs accordingly.
+
+Adopt Experimental flake
 
 ```nix
 # flake.nix
-
 {
-  inputs.daeuniverse.url = "github:daeuniverse/flake.nix";
+  inputs.daeuniverse.url = "github:daeuniverse/flake.nix/exp";
   # ...
 
-  outputs = {nixpkgs, ...} @ inputs: {
+  outputs = {nixpkgs, ...} @inputs: {
     nixosConfigurations.HOSTNAME = nixpkgs.lib.nixosSystem {
       modules = [
         inputs.daeuniverse.nixosModules.dae
@@ -30,8 +34,9 @@ $ nix build github:daeuniverse/flake.nix#packages.x86_64-linux.dae
 }
 ```
 
+## Use with flake
 
-2. Enable dae or daed module.
+Enable dae or daed module
 
 ```nix
 # configuration.nix
@@ -54,7 +59,6 @@ $ nix build github:daeuniverse/flake.nix#packages.x86_64-linux.dae
   };
 ```
 
-
 ```nix
 # with daed
   services.daed = {
@@ -67,43 +71,14 @@ $ nix build github:daeuniverse/flake.nix#packages.x86_64-linux.dae
         port = 12345;
       };
   };
-
 ```
 
-## Directly use packages
+## Directly use the packages
 
 ```nix
-
 environment.systemPackages =
   with inputs.daeuniverse.packages.x86_64-linux;
     [ dae daed ];
-
-```
-
-## Nightly build
-
-If you would like to get a taste of new features and do not want to wait for new releases, you may use the `nightly` (unstable branch) flake. The `nightly` flake is always _**up-to-date**_ with the upstream `dae` and `daed` (sync with the `main` branch) projects. Most of the time, newly proposed changes will be included in PRs, will be fully tested, and will be exported as cross-platform executable binaries in builds (GitHub Action Workflow Build).
-
-> [!WARNING]
-> Noted that newly introduced features are sometimes buggy, do it at your own risk. However, we still highly encourage you to check out our latest builds as it may help us further analyze features stability and resolve potential bugs accordingly.
-
-Adopt nightly flake
-
-```nix
-# flake.nix
-{
-  inputs.daeuniverse.url = "github:daeuniverse/flake.nix/unstable";
-  # ...
-
-  outputs = {nixpkgs, ...} @inputs: {
-    nixosConfigurations.HOSTNAME = nixpkgs.lib.nixosSystem {
-      modules = [
-        inputs.daeuniverse.nixosModules.dae
-        inputs.daeuniverse.nixosModules.daed
-      ];
-    };
-  }
-}
 ```
 
 ## License
