@@ -5,7 +5,7 @@
 }:
 buildGoModule rec {
   pname = "dae";
-  version = "unstable-2024-03-04.pr466.r1.769d2a4";
+  version = "unstable-2024-03-04.pr-466.r1.769d2a4";
 
   src = fetchFromGitHub {
     owner = "daeuniverse";
