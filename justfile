@@ -10,17 +10,21 @@ set positional-arguments := true
 default:
   @just --list
 
-# rebuild nixos
+# build pkg
 build pkg:
   @nix build .#{{ pkg }}
 
+# check version
+version pkg:
+  @./result/bin/{{ pkg }} --version
+
 # update all flake inputs
 update:
-  @sudo nix flake update
+  @nix flake update
 
 # update a particular flake input
 update-input input:
-  @sudo nix flake lock --update-input {{ input }}
+  @nix flake lock --update-input {{ input }}
 
 # nix-prefetch-url
 prefetch-url url:
@@ -33,4 +37,3 @@ prefetch-git repo rev:
 # stage all files
 add:
   @git add .
-
