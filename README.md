@@ -12,18 +12,16 @@ nix build .#dae
 
 If you would like to get a taste of new features and do not want to wait for new releases, you may use the `experimental` (exp branch) flake. The `experimental` flake is always _**ahead**_ with the upstream `dae` and `daed` (sync with upstream `prs` to test new features or fix bugs) projects. Most of the time, newly proposed changes will be included in PRs, will be fully tested, and will be exported as cross-platform executable binaries in builds (GitHub Action Workflow Build).
 
-> [!WARNING]
-> Noted that newly introduced features are sometimes buggy, do it at your own risk. However, we still highly encourage you to check out our latest builds as it may help us further analyze features stability and resolve potential bugs accordingly.
-
-Adopt Experimental flake
+1. Import nixosModule.
 
 ```nix
 # flake.nix
+
 {
-  inputs.daeuniverse.url = "github:daeuniverse/flake.nix/exp";
+  inputs.daeuniverse.url = "github:daeuniverse/flake.nix";
   # ...
 
-  outputs = {nixpkgs, ...} @inputs: {
+  outputs = {nixpkgs, ...} @ inputs: {
     nixosConfigurations.HOSTNAME = nixpkgs.lib.nixosSystem {
       modules = [
         inputs.daeuniverse.nixosModules.dae
@@ -34,51 +32,65 @@ Adopt Experimental flake
 }
 ```
 
-## Use with flake
 
-Enable dae or daed module
+2. Enable dae or daed module.
+
+> To see full options, check `dae{,d}/module.nix`.
 
 ```nix
 # configuration.nix
 
-# to see full options, check dae{,d}/module.nix
+{
+  # ...
 
-# with dae
+  # with dae as a systemd service
   services.dae = {
       enable = true;
-      package = pkgs.dae;
+      # package = inputs.daeuniverse.packages.x86_64-linux.daed; # default
       disableTxChecksumIpGeneric = false;
       configFile = "/etc/dae/config.dae";
       assets = with pkgs; [ v2ray-geoip v2ray-domain-list-community ];
-      # alternatively, specify assets dir
+      # alternatively, specify a dir which contains geo database.
       # assetsPath = "/etc/dae";
       openFirewall = {
         enable = true;
         port = 12345;
       };
   };
+}
 ```
 
+
 ```nix
-# with daed
+# configuration.nix
+
+{
+  # ...
+
+  # daed - dae with a web dashboard
   services.daed = {
       enable = true;
-      package = pkgs.daed;
-      configdir = "/etc/daed";
+      # package = inputs.daeuniverse.packages.x86_64-linux.daed; # default
+      configDir = "/etc/daed";
       listen = "0.0.0.0:2023";
-      openfirewall = {
+      openFirewall = {
         enable = true;
         port = 12345;
       };
   };
+}
 ```
 
-## Directly use the packages
+## Directly use packages
 
 ```nix
-environment.systemPackages =
-  with inputs.daeuniverse.packages.x86_64-linux;
+# configuration.nix
+
+{
+  environment.systemPackages =
+    with inputs.daeuniverse.packages.x86_64-linux;
     [ dae daed ];
+}
 ```
 
 ## License
