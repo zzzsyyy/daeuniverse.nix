@@ -37,7 +37,7 @@ prefetch-git repo rev:
 # update metadata for a project based off the latest upstream git commit
 update-metadata project:
     #!/usr/bin/env bash
-    set -euo pipefail
+    set -euxo pipefail
     # Fetch the metadata for the project
     json_output=$(just prefetch-git daeuniverse/{{ project }} refs/heads/main | jq)
     # Extract the necessary values from the json_output
@@ -54,6 +54,12 @@ update-metadata project:
        ./{{ project }}/metadata.json | tee ./{{ project }}/metadata.json.tmp
     # Replace the original file
     mv ./{{ project }}/{metadata.json.tmp,metadata.json}
+    vendor=$(nix --log-format raw build .#{{ project }} 2>&1 | grep  "got: " | awk '/got: / {print $NF}' || echo "")
+    jq --arg vendor "$vendor" \
+       '.vendorHash = $vendor' \
+       ./{{ project }}/metadata.json | tee ./{{ project }}/metadata.json.tmp
+    mv ./{{ project }}/{metadata.json.tmp,metadata.json}
+
     
 
 # stage all files
